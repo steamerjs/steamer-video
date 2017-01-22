@@ -1,0 +1,36 @@
+@base-font-size: 64px;
+@ip6-font-size: 75px;
+
+.px2rem(@name, @px) {
+    @{name}: @px / @base-font-size * 1rem;
+}
+
+.px2rem2(@name, @px1, @px2) {
+	@{name}: @px1 / @base-font-size * 1rem @px2 / @base-font-size * 1rem;
+}
+
+.px2rem4(@name, @px1, @px2, @px3, @px4) {
+	@{name}: @px1 / @base-font-size * 1rem @px2 / @base-font-size * 1rem @px3 / @base-font-size * 1rem @px4 / @base-font-size * 1rem;
+}
+
+.px2remargs(@name, @px, @args) {
+	@{name}: @px / @base-font-size * 1rem @args;
+}
+
+
+
+.px2rem-ip6(@name, @px) {
+    @{name}: @px / @ip6-font-size * 1rem;
+}
+
+.px2rem2-ip6(@name, @px1, @px2) {
+	@{name}: @px1 / @ip6-font-size * 1rem @px2 / @ip6-font-size * 1rem;
+}
+
+.px2rem4-ip6(@name, @px1, @px2, @px3, @px4) {
+	@{name}: @px1 / @ip6-font-size * 1rem @px2 / @ip6-font-size * 1rem @px3 / @ip6-font-size * 1rem @px4 / @ip6-font-size * 1rem;
+}
+
+.px2remargs-ip6(@name, @px, @args) {
+	@{name}: @px / @ip6-font-size * 1rem @args;
+}
