@@ -28,16 +28,10 @@ export default class SteamerVideo extends Component {
             src,
             type,
             muted,
-            loop,
-            // videoData,
+            loop
         } = this.props;        
 
-        // let v = videoData.list[0] || {},
-        //     pic = v.pic_url || "";
 
-        // let style = {
-        //     backgroundImage: "url(" + pic + ")"
-        // };
 
         return (
             <video

@@ -8,7 +8,7 @@ export const ControlBar = function(props) {
     };
     let progressBtnStyle = {
         marginLeft: props.videoControlLen
-    };
+    };  // 圈圈
 
     return (
         <div 
@@ -24,17 +24,4 @@ export const ControlBar = function(props) {
             <div className="video-bar-control" style={progressBtnStyle}></div>
         </div>
     )
-
-    // return (
-    //     <div className="sr-controlbar-wrapper" 
-    //         onTouchStart={props.manualAdjustProgress}
-    //         onTouchMove={props.manualAdjustProgress}
-    //         onTouchEnd={props.manualAdjustTime}
-    //     >
-    //         <div className="sr-controlbar-item"></div>
-    //         <div className="sr-controlbar-load"></div>
-    //         <div className="sr-controlbar-progress" style={progressStyle}></div>
-    //         <div className="sr-control-btn" style={progressBtnStyle}></div>
-    //     </div>
-    // )
 };

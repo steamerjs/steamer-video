@@ -34,6 +34,7 @@ export default class Video extends Component {
 		let windowScrollTop = window.document.body.scrollTop || window.document.documentElement.scrollTop;
 			windowScrollTop += 80;
 
+
 		let style = {
 			display: "block",
 			height: window.document.body.scrollHeight + "px",
@@ -48,6 +49,7 @@ export default class Video extends Component {
             backgroundImage: "url(" + pic + ")"
         };
 
+
 		return (
 			<div 
 				className="video-wrapper" 
@@ -56,9 +58,10 @@ export default class Video extends Component {
 					e.preventDefault();
 				}}
 			>
+				{/*
 				<div 
 					className="video-cover"
-				></div>
+				></div>*/}
 				<div 
 					className="video-player"
 				>
@@ -73,8 +76,8 @@ export default class Video extends Component {
 			                    poster={require("./img/black-bg.png")}
 							/>
 						</div>
-						<div className="video-list-innert-mask"></div>
-						<div className="mask"></div>
+						{/*<div className="video-list-innert-mask"></div>
+						<div className="mask"></div>*/}
 						{
 							videoData.list[0].url ? 
 								<PlayBackController 
@@ -83,10 +86,11 @@ export default class Video extends Component {
 								/> : null
 						}
 					</div>
+					{/*
 					<div className="video-card">
 						<div className="profile-action">
 						</div>
-					</div>
+					</div>*/}
 				</div>
 			</div>
 		)

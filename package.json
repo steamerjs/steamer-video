@@ -7,7 +7,7 @@
     "build": "babel src --out-dir lib --copy-files",
     "prepublish": "babel src --out-dir lib --copy-files",
     "start": "node ./tools/start.js",
-    "dev": "node ./tools/start.js",
+    "dev": "babel src --out-dir lib --copy-files --watch",
     "lint": "eslint src&&stylelint src/css/*.less",
     "test": "jest"
   },

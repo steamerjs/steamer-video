@@ -22,19 +22,18 @@ export default class PlayBackController extends Component {
     constructor(props, context) {
         super(props, context);
         this.state = {
-            canPlay: false, 
-            isEnd: false,                
-            isPlay: false,					// playing or not
-            isMute: false,					// mute or note
-            audioControllerLen: "0",  		// audio controller length
-            audioVolumeBarLen: "0",			// current audio volume bar length
-            videoCurrentProgress: "0",      // current video played progress
-            videoControlLen: "0",			// current video played progress btn
-            videoCurrentTime: 0,			// video current time
+            canPlay: false,                 
+            isEnd: false,                   // 是否播放结束     
+            isPlay: false,					// 是否正在播放
+            // isMute: false,					// mute or note
+            // audioControllerLen: "0",  		// audio controller length
+            // audioVolumeBarLen: "0",			// current audio volume bar length
+            videoCurrentProgress: "0",      // 进度条已播放的长度百分比
+            videoControlLen: "0",			// 进度条圈圈控件离里进度条最左边的距离
+            videoCurrentTime: 0,			// 当前播放的时间，单位为秒
         };
         this.startAdjusting = false;
-        // this.toggleAudio = this.toggleAudio.bind(this);
-        // this.adjustAudio = this.adjustAudio.bind(this);
+
         this.autoAdjustProgress = this.autoAdjustProgress.bind(this);
         this.manualAdjustProgress = this.manualAdjustProgress.bind(this);
         this.manualMouseDownAdjustProgress = this.manualMouseDownAdjustProgress.bind(this);
@@ -50,11 +49,12 @@ export default class PlayBackController extends Component {
         this.videoSeeking = this.videoSeeking.bind(this);
         this.loadNextVideo = this.loadNextVideo.bind(this);
         this.playNextVideo = this.playNextVideo.bind(this);
+
         this.video = {
-            v: null,			// current playing video element
-            id: null,			// the id of the specifying video data
-            list: [],			// video elements
-            listLen: 0,			// number of video elements
+            v: null,			// 当前播放的video element
+            id: null,			// 当前播放的video的下标
+            list: [],			// video element列表
+            listLen: 0,			// video element列表长度
         };
         // control bar
         this.progress = {
@@ -79,24 +79,24 @@ export default class PlayBackController extends Component {
                 max: 100,
             }
         };
-        // audio setting
-        this.audio = {
-            // audio bar
-            bar: {
-                len: 0,
-            },
-            // current audio volume bar
-            volumeBar: {
-                min: 0,
-                max: 100,
-            },
-            // controller button
-            controller: {
-                start: 0,
-                min: -5,
-                max: 95,
-            },
-        };
+        // // audio setting
+        // this.audio = {
+        //     // audio bar
+        //     bar: {
+        //         len: 0,
+        //     },
+        //     // current audio volume bar
+        //     volumeBar: {
+        //         min: 0,
+        //         max: 100,
+        //     },
+        //     // controller button
+        //     controller: {
+        //         start: 0,
+        //         min: -5,
+        //         max: 95,
+        //     },
+        // };
     }
     componentWillReceiveProps(nextProps) {
         // this.initTicker(nextProps);
@@ -133,12 +133,18 @@ export default class PlayBackController extends Component {
         v.addEventListener('seeking', this.videoSeeking);
     }
 
+    /**
+     * 浏览器正在请求数据
+     */
     videoSeeking(e) {
         this.setState({
             canPlay: false
         });
     }
 
+    /**
+     * 浏览器能够播放媒体，但估计以当前播放速率不能直接将媒体播完，播放期间需要缓冲
+     */
     videoCanPlay(e) {
         this.setState({
             canPlay: true
@@ -147,41 +153,53 @@ export default class PlayBackController extends Component {
         let duration = e.target.duration;
         this.props.videoData.meta.totalDuration = duration;
 
-        // if (this.props.videoData.list.length) {
-        //     this.props.videoData.list[0].duration = duration;
-        // }
-
         this.initProgress();
         this.initTicker(duration);
 
     }
+
+    /**
+     * 当前播放位置发生改变
+     */
     videoTimeUpdate(e) {
         this.autoAdjustProgress(e);
     }
+
+    /**
+     * 播放结束
+     */
     videoEnded(e) {
         this.playNextVideo();
         this.setState({
             isEnd: true
         });
     }
+
+    /**
+     * 开始播放
+     */
     videoPlaying(e) {
         this.playing();
     }
+
     /**
-     * [init video element list]
+     * 初始化video element列表
      */
     initVideoList() {
         this.video.list = document.getElementById(this.props.videoIdName).children;
         this.video.listLen = this.video.list.length;
     }
+
     /**
-     * [init video itself]
-     * @param  {Integer} id [current video id]
+     * 初始化当前video
+     * @param  {Integer} id 当前video的id
      */
     initVideo(id) {
-        this.video.v = this.video.list[id % 3];
+        // todo 3是什么鬼？
+        this.video.v = this.video.list[id % 3]; // 当前的video DOM对象
         this.video.id = id;
         let videoDataList = this.props.videoData.list;
+        // 加载视频
         if (!this.video.v.src) {
             this.video.v.src = videoDataList[id].url;
             this.video.v.load();
@@ -197,28 +215,35 @@ export default class PlayBackController extends Component {
                 v.style.display = "none";
             }
         }
-        // console.log(this.video.id);
     }
     /**
-     * [init the ticker riger next to play button]
-     * @param  {Object} props [props passed from parent component]
+     * 初始化总播放时间
+     * @param  {Float} 总播放时间
      */
     initTicker(duration) {
         // 已经设了就不再设duration了，这里改到timeupdate事件设，是为了兼容某些浏览器
         if (!this.progress.progressBar.duration) {
             this.progress.progressBar.duration = duration;
+
+            // todo 在props的videoData上增加duration
+            var videoId = this.video.id;
+            if(this.props.videoData.list && this.props.videoData.list[videoId]) {
+                this.props.videoData.list[videoId].duration = duration;
+            }
+
             this.progress.progressBar.durationText = getTotalDuraction(this.progress.progressBar.duration);
         }
     }
+
     /**
-     * [init video control bar]
+     * 初始化 control bar
      */
     initProgress() {
         this.progress.bar.len = document.querySelector('.video-bar').clientWidth;
         this.progress.controller.max = this.progress.bar.len - 5;
     }
     /**
-     * [auto ajdust the control bar while video is playing]
+     * [auto ajdust the control bar while video is playing] 改变control bar
      * @param  {Object} e [event object]
      */
     autoAdjustProgress(e) {
@@ -230,15 +255,18 @@ export default class PlayBackController extends Component {
 
         let currentTime = e.target.currentTime,
             progressBar = this.progress.progressBar;
+
         let percentage = (progressBar.accuTime + currentTime) / progressBar.duration;
         
-        percentage = getPercent(percentage);
+        percentage = getPercent(percentage);    // 更新百分比样式
         // console.dev(Math.round(percentage * 10000) / 100 + "%");
+
+
         this.adjustProgress(percentage);
     }
     /**
-     * [manually adjust the control bar by user]
-     * @param  {Object} e [event object]
+     * 用户操作(点击或移动)control bar，touchstart或touchmove时触发
+     * @param  {Object} e 事件对象
      */
     manualAdjustProgress(e) {
         // if manual ,pause first
@@ -246,13 +274,19 @@ export default class PlayBackController extends Component {
         let progressBar = this.progress.progressBar,
             controller = this.progress.controller,
             bar = this.progress.bar;
+
         let diff = e.changedTouches[0].clientX - controller.start,
             percentage = diff / bar.len;
-        percentage = getPercent(percentage);
-        console.dev(Math.round(percentage * 10000) / 100 + "%");
+
+
+        percentage = getPercent(percentage);    // 根据鼠标位置对比，获取百分比
+
         this.adjustProgress(percentage, true);
     }
 
+    /**
+     * mouseDown事件处理
+     */
     manualMouseDownAdjustProgress(e) {
         if (!this.state.canPlay) {
             return;
@@ -262,6 +296,9 @@ export default class PlayBackController extends Component {
         this.manualMouseAdjustProgress(e);
     }
 
+    /**
+     * mouseMove事件处理
+     */
     manualMouseAdjustProgress(e) {
         // if manual ,pause first
         if (!this.startAdjusting) {
@@ -276,26 +313,29 @@ export default class PlayBackController extends Component {
         let diff = e.clientX - controller.start,
             percentage = diff / bar.len;
         percentage = getPercent(percentage);
-        console.dev(Math.round(percentage * 10000) / 100 + "%");
+
         this.adjustProgress(percentage, true);
     }
     /**
-     * [common logic adjust the bar]
-     * @param  {Float}  percentage  [playing percent]
-     * @param  {Boolean} isManual   [auto or manual]
+     * 调整进度条位置
+     * @param  {Float}  percentage  当前播放进度的比率
+     * @param  {Boolean} isManual   是否手动操作
      */
     adjustProgress(percentage, isManual = false) {
         let progressBar = this.progress.progressBar,
             controller = this.progress.controller,
             bar = this.progress.bar;
+
+        // 百分比
         let videoCurrentProgress = progressBar.min + percentage * progressBar.max;
+
         let clength = controller.min + percentage * bar.len;
             clength = (clength < controller.min) ? controller.min : clength;
             clength = (clength > controller.max) ? controller.max : clength;
         
         progressBar.currentTime = percentage * progressBar.duration;
         let interval = getIntervalTime(this.props.videoData.list, this.video.id);
-        // console.log(!isManual, interval.max, progressBar.currentTime);
+
         if (!isManual && interval.max - progressBar.currentTime <= 10) {
             this.loadNextVideo();
         }
@@ -307,8 +347,8 @@ export default class PlayBackController extends Component {
         });
     }
     /**
-     * [touchend then start change video currentTime]
-     * @param  {Object} e [event object]
+     * touchend或mouseDown的处理
+     * @param  {Object} e 事件对象
      */
     manualAdjustTime(e) {
         this.startAdjusting = false;
@@ -317,14 +357,13 @@ export default class PlayBackController extends Component {
             videoDataList = this.props.videoData.list;
         let len = videoDataList.length,
             totalTime = 0;
-            // isInCurrentPiece = false;
         let interval = getIntervalTime(videoDataList, this.video.id);
-        // console.log(this.video.id, interval.min, interval.max);
-        // in current video piece, directly change video current time prop
+
+
+        // 当前播放时间处于当前的播放片段时，改变video的currentTime
         if (progressBar.currentTime >= interval.min 
             && progressBar.currentTime <= interval.max) {
             this.video.v.currentTime = progressBar.currentTime - progressBar.accuTime;
-            // console.log(this.video.v.currentTime, progressBar.currentTime, progressBar.accuTime, progressBar.currentTime - progressBar.accuTime);
             this.play();
         }
         // if the current video piece is not in range, load the new piece
@@ -350,6 +389,7 @@ export default class PlayBackController extends Component {
                 }
             }
             interval.max = totalTime;
+
         }
         let currentTime = this.state.videoCurrentTime;
         if (interval.max - currentTime <= 10) {
@@ -421,56 +461,7 @@ export default class PlayBackController extends Component {
             this.video.v.pause();
         });
     }
-    // init video volume part
-    // initAudio() {
-    //     this.audio.controller.start = document.querySelector('.sr-control-panel-right').offsetLeft + 30;
-    //     this.audio.bar.len = document.querySelector('.sr-audio-bar').clientWidth;
-    //     this.setState({
-    //         audioControllerLen: "95px",
-    //         audioVolumeBarLen: "100px",
-    //     });
-    // }
-    // // mute the audio or not
-    // toggleAudio() {
-    //     let isMute = this.state.isMute,
-    //         controller = this.audio.controller,
-    //         volumeBar = this.audio.volumeBar;
-    //     this.setState({
-    //         isMute: isMute ? false : true,
-    //         audioControllerLen: isMute ? controller.max + "px" : controller.min + "px",
-    //         audioVolumeBarLen: isMute ? volumeBar.max + "%" : volumeBar.min + "%",	
-    //     }, () => {
-    //         this.video.v.volume = (this.state.isMute) ? 0 : 1;
-    //     });
-    // }
-    // move / touch the audio bar
-    // adjustAudio(e) {
-    //     let controller  = this.audio.controller,
-    //         bar = this.audio.bar,
-    //         volumeBar = this.audio.volumeBar;
-    //     let diff = e.changedTouches[0].clientX - controller.start,
-    //         percentage = diff / bar.len;
-    //     percentage = (percentage > 1) ? 1 : percentage,
-    //     percentage = (percentage < 0) ? 0 : percentage;
-    //     // controller length
-    //     let clength = controller.min + percentage * bar.len;
-    //         clength = (clength < controller.min) ? controller.min : clength;
-    //         clength = (clength > controller.max) ? controller.max : clength;
-    //     // current volume bar length
-    //     let blength = volumeBar.min + percentage * 100;
-    //         blength = (blength < volumeBar.min) ? volumeBar.min : blength;
-    //         blength = (blength > volumeBar.max) ? volumeBar.max : blength;
-    //     // set video volume
-    //     this.video.v.volume = percentage;
-    //     this.setState({
-    //         audioControllerLen: clength,
-    //         audioVolumeBarLen: blength + "%"
-    //     });
-    //     if (clength === controller.min && !this.state.mute 
-    //         || clength > controller.min && this.state.mute) {
-    //         this.toggleAudio();
-    //     }
-    // }
+ 
     render() {
             
             let playBtnStyle = {

@@ -51,8 +51,9 @@ export function getIntervalTime(videoDataList, videoId) {
         min = 0;
     for (let i = 0; i <= videoId; i++) {
         let v = videoDataList[i];
-        max += v.duration;
+        max += v.duration;  // 没有duration属性
     }
+
     // if videoId = 0, then min should be 0
     min = (videoId) ? (max - videoDataList[videoId].duration) : 0;
     return {
