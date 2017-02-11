@@ -103,6 +103,8 @@ export default class PlayBackController extends Component {
     }
     componentWillMount() {
         // this.initTicker(this.props);
+
+        // this.initTotalTicker(this.props);
     }
     componentDidMount() {
         let controlPos = document.querySelector('.video-bar-control').getBoundingClientRect();
@@ -116,6 +118,25 @@ export default class PlayBackController extends Component {
         console.log("=====componentWillUnmount child====");
         this.removeVideoEvent();
     }
+
+    // initTotalTicker(props) {
+    //     let videoDataList = props.videoData.list;
+    //     let totalDuration = 0;
+
+    //     for(var i = 0 ; i < videoDataList.length; i++) {
+    //         var curDuration = videoDataList[i].duration;
+    //         if(curDuration) {
+    //             totalDuration += curDuration;
+    //         }
+    //     }
+
+    //     // if (!this.progress.progressBar.duration) {
+    //     //     this.progress.progressBar.duration = duration;
+    //     //     this.progress.progressBar.durationText = getTotalDuraction(this.progress.progressBar.duration);
+
+    //     // }
+    // }
+
     removeVideoEvent() {
         let v = this.video.v;
         v.removeEventListener('canplay', this.videoCanPlay);
@@ -135,6 +156,7 @@ export default class PlayBackController extends Component {
 
     /**
      * 浏览器正在请求数据
+     * @param  {Object} e 事件对象
      */
     videoSeeking(e) {
         this.setState({
@@ -144,6 +166,7 @@ export default class PlayBackController extends Component {
 
     /**
      * 浏览器能够播放媒体，但估计以当前播放速率不能直接将媒体播完，播放期间需要缓冲
+     * @param  {Object} e 事件对象
      */
     videoCanPlay(e) {
         this.setState({
@@ -160,6 +183,7 @@ export default class PlayBackController extends Component {
 
     /**
      * 当前播放位置发生改变
+     * @param  {Object} e 事件对象
      */
     videoTimeUpdate(e) {
         this.autoAdjustProgress(e);
@@ -167,6 +191,7 @@ export default class PlayBackController extends Component {
 
     /**
      * 播放结束
+     * @param  {Object} e 事件对象
      */
     videoEnded(e) {
         this.playNextVideo();
@@ -177,6 +202,7 @@ export default class PlayBackController extends Component {
 
     /**
      * 开始播放
+     * @param  {Object} e 事件对象
      */
     videoPlaying(e) {
         this.playing();
@@ -195,7 +221,6 @@ export default class PlayBackController extends Component {
      * @param  {Integer} id 当前video的id
      */
     initVideo(id) {
-        // todo 3是什么鬼？
         this.video.v = this.video.list[id % 3]; // 当前的video DOM对象
         this.video.id = id;
         let videoDataList = this.props.videoData.list;
@@ -224,14 +249,14 @@ export default class PlayBackController extends Component {
         // 已经设了就不再设duration了，这里改到timeupdate事件设，是为了兼容某些浏览器
         if (!this.progress.progressBar.duration) {
             this.progress.progressBar.duration = duration;
+            this.progress.progressBar.durationText = getTotalDuraction(this.progress.progressBar.duration);
 
             // todo 在props的videoData上增加duration
             var videoId = this.video.id;
-            if(this.props.videoData.list && this.props.videoData.list[videoId]) {
+            if(this.props.videoData.list && this.props.videoData.list[videoId] 
+                && !this.props.videoData.list[videoId].duration) {
                 this.props.videoData.list[videoId].duration = duration;
             }
-
-            this.progress.progressBar.durationText = getTotalDuraction(this.progress.progressBar.duration);
         }
     }
 
@@ -243,15 +268,15 @@ export default class PlayBackController extends Component {
         this.progress.controller.max = this.progress.bar.len - 5;
     }
     /**
-     * [auto ajdust the control bar while video is playing] 改变control bar
-     * @param  {Object} e [event object]
+     * 自动播放视频时改变进度条
+     * @param  {Object} e 事件对象
      */
     autoAdjustProgress(e) {
         if (e.target.paused) {
             return;
         }
         
-        this.initTicker(e.target.duration);
+        // this.initTicker(e.target.duration);
 
         let currentTime = e.target.currentTime,
             progressBar = this.progress.progressBar;
@@ -259,7 +284,6 @@ export default class PlayBackController extends Component {
         let percentage = (progressBar.accuTime + currentTime) / progressBar.duration;
         
         percentage = getPercent(percentage);    // 更新百分比样式
-        // console.dev(Math.round(percentage * 10000) / 100 + "%");
 
 
         this.adjustProgress(percentage);
@@ -286,6 +310,7 @@ export default class PlayBackController extends Component {
 
     /**
      * mouseDown事件处理
+     * @param  {Object} e 事件对象
      */
     manualMouseDownAdjustProgress(e) {
         if (!this.state.canPlay) {
@@ -298,6 +323,7 @@ export default class PlayBackController extends Component {
 
     /**
      * mouseMove事件处理
+     * @param  {Object} e 事件对象
      */
     manualMouseAdjustProgress(e) {
         // if manual ,pause first
@@ -398,32 +424,34 @@ export default class PlayBackController extends Component {
     }
     // preload the next video
     loadNextVideo() {
-        let videoData = this.props.videoData.list,
-            len = videoData.length;
-        // console.log(this.video, this.video.id, len - 1);
-        if (this.video.id === len - 1) {
-            return;
-        }
-        let nextVideoId = this.video.id + 1;
-        let nextVideo = this.video.list[nextVideoId % 3];
-        if (!nextVideo.src) {
-            nextVideo.src = videoData[nextVideoId].url;
-            nextVideo.volume = this.video.v.volume;
-            nextVideo.load();
-        }
+        // console.log('load next video');
+        // let videoData = this.props.videoData.list,
+        //     len = videoData.length;
+        // // console.log(this.video, this.video.id, len - 1);
+        // if (this.video.id === len - 1) {
+        //     return;
+        // }
+        // let nextVideoId = this.video.id + 1;
+        // let nextVideo = this.video.list[nextVideoId % 3];
+        // if (!nextVideo.src) {
+        //     nextVideo.src = videoData[nextVideoId].url;
+        //     nextVideo.volume = this.video.v.volume;
+        //     nextVideo.load();
+        // }
     }
     // play tne next video
     playNextVideo() {
-        let videoData = this.props.videoData.list,
-            len = videoData.length;
-        if (this.video.id === len - 1) {
-            this.pause();
-            return;
-        }
-        this.initVideo(this.video.id + 1);
-        this.progress.progressBar.accuTime += this.props.videoData.list[this.video.id].duration;
-        this.initVideoEvent();
-        this.play();
+        console.log('play next');
+        // let videoData = this.props.videoData.list,
+        //     len = videoData.length;
+        // if (this.video.id === len - 1) {
+        //     this.pause();
+        //     return;
+        // }
+        // this.initVideo(this.video.id + 1);
+        // this.progress.progressBar.accuTime += this.props.videoData.list[this.video.id].duration;
+        // this.initVideoEvent();
+        // this.play();
     }
     resume() {
         this.video.v.currentTime = 0;

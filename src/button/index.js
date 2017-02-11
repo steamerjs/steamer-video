@@ -19,6 +19,7 @@ export const PauseButton = function(props) {
 }
 
 export const CountDown = function(props) {
+    
     return (
         <div className="timing">{props.countDownTime}</div>
     )

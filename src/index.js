@@ -68,7 +68,6 @@ export default class Video extends Component {
 					<div className="video-frame" style={videoFrameStyle}>
 						<div id="video-list">
 							<VideoPlayer 
-								videoData={videoData} 
 								className="video-frame"
 			                    type={"video/mp4"}
 			                    autoplay={false}
