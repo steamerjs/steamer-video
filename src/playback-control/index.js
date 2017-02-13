@@ -46,6 +46,7 @@ export default class PlayBackController extends Component {
         this.videoPlaying = this.videoPlaying.bind(this);
         this.videoEnded = this.videoEnded.bind(this);
         this.videoSeeking = this.videoSeeking.bind(this);
+        this.switchPlayOrPause = this.switchPlayOrPause.bind(this);
 
         this.video = {
             v: null,			// 当前播放的video element
@@ -176,7 +177,7 @@ export default class PlayBackController extends Component {
         });
 
         // 重置视频
-        this.resume();
+        // this.resume();
         this.pause();
 
         this.adjustProgress(0);
@@ -369,6 +370,7 @@ export default class PlayBackController extends Component {
             totalTime = 0;
         let interval = getIntervalTime(videoDataList, this.video.id);
 
+
         this.video.v.currentTime = progressBar.currentTime - progressBar.accuTime;
         this.play();
 
@@ -379,27 +381,26 @@ export default class PlayBackController extends Component {
      * 重新开始视频
      */
     resume() {
-        this.video.v.currentTime = 0;
+        // this.video.v.currentTime = 0;
     }
 
     /**
      * 播放视频
      */
     play() {
-
-        if (!this.state.canPlay || this.state.isPlay) {
+        if (this.state.isPlay || !this.video.v.paused) {
             return;
         }
 
 
-        if (this.state.isEnd) {
-            this.resume();
-        }
-
         this.setState({
             isPlay: true
         }, () => {
-            this.video.v.play();
+            // pause方法之后紧跟着play方法会报错，所以设置150ms延迟
+            setTimeout(() => {
+                this.video.v.play();
+            }, 150);
+            
         });
 
         this.props.setHasPlayed && this.props.setHasPlayed();
@@ -410,8 +411,7 @@ export default class PlayBackController extends Component {
      * 暂停视频
      */
     pause() {
-
-        if (!this.state.canPlay) {
+        if (!this.video.v.played) {
             return;
         }
 
@@ -420,6 +420,22 @@ export default class PlayBackController extends Component {
         }, () => {
             this.video.v.pause();
         });
+    }
+
+    /**
+     * 切换播放与暂停
+     */
+    switchPlayOrPause() {
+        if(!this.state.canPlay) {
+            return;
+        }
+
+        if(this.state.isPlay) {
+            this.pause();
+            
+        } else {
+            this.play();
+        }
     }
  
     render() {
@@ -431,8 +447,8 @@ export default class PlayBackController extends Component {
             return (
                 <div 
                     className="video-wrap"
-                    onClick={this.play}
                 >
+                    <div className="video-mask" onClick={this.switchPlayOrPause}></div>
                     <div className="video-loading">
                         {
                             this.state.canPlay ? 
