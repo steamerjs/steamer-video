@@ -40,7 +40,6 @@ export default class PlayBackController extends Component {
         this.manualMouseAdjustProgress = this.manualMouseAdjustProgress.bind(this);
         this.manualAdjustTime = this.manualAdjustTime.bind(this);
         this.play = this.play.bind(this);
-        // this.playing = this.playing.bind(this);
         this.pause = this.pause.bind(this);
         this.videoCanPlay = this.videoCanPlay.bind(this);
         this.videoTimeUpdate = this.videoTimeUpdate.bind(this);
@@ -175,6 +174,12 @@ export default class PlayBackController extends Component {
         this.setState({
             isEnd: true
         });
+
+        // 重置视频
+        this.resume();
+        this.pause();
+
+        this.adjustProgress(0);
     }
 
     /**
@@ -185,6 +190,8 @@ export default class PlayBackController extends Component {
         this.setState({
             isPlay: true
         });
+
+       
     }
 
     /**
@@ -265,8 +272,9 @@ export default class PlayBackController extends Component {
         
         percentage = getPercent(percentage);    // 更新百分比样式
 
-
         this.adjustProgress(percentage);
+
+
     }
     /**
      * 用户操作(点击或移动)control bar，touchstart或touchmove时触发
@@ -383,6 +391,7 @@ export default class PlayBackController extends Component {
         if (!this.state.canPlay || this.state.isPlay) {
             return;
         }
+
 
         if (this.state.isEnd) {
             this.resume();
