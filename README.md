@@ -68,5 +68,6 @@ npm start
 
 Fiddler配置
 ----------
-http://steamer-video.com/index.html    path\steamer-video\example\dev\index.html
-regex:^https?:\/\/steamer-video.com\/(.*)$    path\steamer-video\example\dev\$1
+
+* http://steamer-video.com/index.html    path\steamer-video\example\dev\index.html
+* regex:^https?:\/\/steamer-video.com\/(.*)$    path\steamer-video\example\dev\$1
