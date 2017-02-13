@@ -53,6 +53,16 @@ body {
 	background-size: cover;
 	background-repeat: no-repeat;
 
+	// .video-placeholder-pic {
+	// 	position: absolute;
+	// 	z-index: 1;
+	// 	width: 100%;
+	// 	.px2rem(height, 225);
+	// 	background-size: cover;
+	// 	background-repeat: no-repeat;
+
+	// }
+
 	video {
 		display: none;
 		width: 100%;
@@ -62,7 +72,7 @@ body {
 		// height: 360px;
 		// background-image: url("../video-page/img/v6.png");
 		// background-size: 100%;
-		z-index: -1;
+		// z-index: -1;
 		background-color: #000;
 		background-size: 100%;
 	}
@@ -80,8 +90,15 @@ body {
 	}
 }
 
+#video-list {
+	&.none {
+		display: none;
+	}
+}
+
 .video-wrap {
 	position: absolute;
+	z-index: 2;
 	.px2rem(height, 225);
 	// height: 360px;
 	width: 100%;
@@ -89,6 +106,7 @@ body {
 	// bottom: 0;
 	margin: auto;
 }
+
 
 .video-loading {
 	position: relative;

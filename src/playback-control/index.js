@@ -221,7 +221,7 @@ export default class PlayBackController extends Component {
             let v = this.video.list[i];
             if (id % 3 === i) {
                 v.style.display = "block";
-                v.style.background = "#000";
+                // v.style.background = "#000";
             }
             else {
                 v.style.display = "none";
@@ -369,7 +369,6 @@ export default class PlayBackController extends Component {
             totalTime = 0;
         let interval = getIntervalTime(videoDataList, this.video.id);
 
-
         this.video.v.currentTime = progressBar.currentTime - progressBar.accuTime;
         this.play();
 
@@ -402,6 +401,8 @@ export default class PlayBackController extends Component {
         }, () => {
             this.video.v.play();
         });
+
+        this.props.setHasPlayed && this.props.setHasPlayed();
     }
 
 

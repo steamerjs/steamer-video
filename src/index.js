@@ -9,8 +9,10 @@ export default class Video extends Component {
 	constructor(props, context) {
 		super(props, context);
 		this.state = {
-			
+			hasPlayed: false	// 是否已经播放过	
 		};
+
+		this.setHasPlayed = this.setHasPlayed.bind(this);
 	}
 
 	componentWillMount() {
@@ -23,6 +25,12 @@ export default class Video extends Component {
 
 	componentWillUnmount() {
 		
+	}
+
+	setHasPlayed() {
+		this.setState({
+			hasPlayed: true
+		});
 	}
 
 	render() {
@@ -66,7 +74,7 @@ export default class Video extends Component {
 					className="video-player"
 				>
 					<div className="video-frame" style={videoFrameStyle}>
-						<div id="video-list">
+						<div id="video-list" className={this.state.hasPlayed ? "" : "none"}>
 							<VideoPlayer 
 								className="video-frame"
 			                    type={"video/mp4"}
@@ -74,6 +82,7 @@ export default class Video extends Component {
 			                    preload={true}
 			                    poster={require("./img/black-bg.png")}
 							/>
+							
 						</div>
 						{/*<div className="video-list-innert-mask"></div>
 						<div className="mask"></div>*/}
@@ -82,6 +91,7 @@ export default class Video extends Component {
 								<PlayBackController 
 									videoData={videoData} 
 									videoIdName={"video-list"}
+									setHasPlayed={this.setHasPlayed}
 								/> : null
 						}
 					</div>
