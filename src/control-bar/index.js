@@ -12,7 +12,7 @@ export const ControlBar = function(props) {
 
     return (
         <div 
-            className="video-bar"
+            className="steamer-video-bar"
             onTouchStart={props.manualAdjustProgress}
             onTouchMove={props.manualAdjustProgress}
             onTouchEnd={props.manualAdjustTime}
@@ -20,8 +20,8 @@ export const ControlBar = function(props) {
             onMouseMove={props.manualMouseAdjustProgress}
             onMouseUp={props.manualAdjustTime}
         >
-            <div className="video-bar-progress" style={progressStyle}></div>
-            <div className="video-bar-control" style={progressBtnStyle}></div>
+            <div className="steamer-video-bar-progress" style={progressStyle}></div>
+            <div className="steamer-video-bar-control" style={progressBtnStyle}></div>
         </div>
     )
 };

@@ -60,23 +60,19 @@ export default class Video extends Component {
 
 		return (
 			<div 
-				className="video-wrapper" 
+				className="steamer-video-wrapper" 
 				style={style}
 				onTouchMove={(e) => {
 					e.preventDefault();
 				}}
 			>
-				{/*
 				<div 
-					className="video-cover"
-				></div>*/}
-				<div 
-					className="video-player"
+					className="steamer-video-player"
 				>
-					<div className="video-frame" style={videoFrameStyle}>
-						<div id="video-list" className={this.state.hasPlayed ? "" : "none"}>
+					<div className="steamer-video-frame" style={videoFrameStyle}>
+						<div id="steamer-video-list" className={this.state.hasPlayed ? "" : "none"}>
 							<VideoPlayer 
-								className="video-frame"
+								className="steamer-video-frame"
 			                    type={"video/mp4"}
 			                    autoplay={false}
 			                    preload={true}
@@ -84,22 +80,15 @@ export default class Video extends Component {
 							/>
 							
 						</div>
-						{/*<div className="video-list-innert-mask"></div>
-						<div className="mask"></div>*/}
 						{
 							videoData.list[0].url ? 
 								<PlayBackController 
 									videoData={videoData} 
-									videoIdName={"video-list"}
+									videoIdName={"steamer-video-list"}
 									setHasPlayed={this.setHasPlayed}
 								/> : null
 						}
 					</div>
-					{/*
-					<div className="video-card">
-						<div className="profile-action">
-						</div>
-					</div>*/}
 				</div>
 			</div>
 		)

@@ -35,7 +35,7 @@ export default class SteamerVideo extends Component {
 
         return (
             <video
-                className="sr-video-container" 
+                className="steamer-video-container" 
                 src={src} 
                 type={type}
                 autoPlay={autoplay || false}

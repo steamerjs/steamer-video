@@ -25,9 +25,6 @@ export default class PlayBackController extends Component {
             canPlay: false,                 
             isEnd: false,                   // 是否播放结束     
             isPlay: false,					// 是否正在播放
-            // isMute: false,					// mute or note
-            // audioControllerLen: "0",  		// audio controller length
-            // audioVolumeBarLen: "0",			// current audio volume bar length
             videoCurrentProgress: "0",      // 进度条已播放的长度百分比
             videoControlLen: "0",			// 进度条圈圈控件离里进度条最左边的距离
             videoCurrentTime: 0,			// 当前播放的时间，单位为秒
@@ -77,31 +74,13 @@ export default class PlayBackController extends Component {
                 max: 100,
             }
         };
-        // // audio setting
-        // this.audio = {
-        //     // audio bar
-        //     bar: {
-        //         len: 0,
-        //     },
-        //     // current audio volume bar
-        //     volumeBar: {
-        //         min: 0,
-        //         max: 100,
-        //     },
-        //     // controller button
-        //     controller: {
-        //         start: 0,
-        //         min: -5,
-        //         max: 95,
-        //     },
-        // };
     }
     componentWillReceiveProps(nextProps) {
     }
     componentWillMount() {
     }
     componentDidMount() {
-        let controlPos = document.querySelector('.video-bar-control').getBoundingClientRect();
+        let controlPos = document.querySelector('.steamer-video-bar-control').getBoundingClientRect();
         this.progress.controller.start = controlPos.left;
 
         this.initVideoList();
@@ -171,13 +150,10 @@ export default class PlayBackController extends Component {
      * @param  {Object} e 事件对象
      */
     videoEnded(e) {
-        // this.playNextVideo();
         this.setState({
             isEnd: true
         });
 
-        // 重置视频
-        // this.resume();
         this.pause();
 
         this.adjustProgress(0);
@@ -222,7 +198,6 @@ export default class PlayBackController extends Component {
             let v = this.video.list[i];
             if (id % 3 === i) {
                 v.style.display = "block";
-                // v.style.background = "#000";
             }
             else {
                 v.style.display = "none";
@@ -252,7 +227,7 @@ export default class PlayBackController extends Component {
      * 初始化 control bar
      */
     initProgress() {
-        this.progress.bar.len = document.querySelector('.video-bar').clientWidth;
+        this.progress.bar.len = document.querySelector('.steamer-video-bar').clientWidth;
         this.progress.controller.max = this.progress.bar.len - 5;
     }
     /**
@@ -263,8 +238,6 @@ export default class PlayBackController extends Component {
         if (e.target.paused) {
             return;
         }
-        
-        // this.initTicker(e.target.duration);
 
         let currentTime = e.target.currentTime,
             progressBar = this.progress.progressBar;
@@ -331,6 +304,7 @@ export default class PlayBackController extends Component {
 
         this.adjustProgress(percentage, true);
     }
+
     /**
      * 调整进度条位置
      * @param  {Float}  percentage  当前播放进度的比率
@@ -357,6 +331,7 @@ export default class PlayBackController extends Component {
             videoCurrentTime: progressBar.currentTime
         });
     }
+
     /**
      * touchend或mouseDown的处理
      * @param  {Object} e 事件对象
@@ -391,7 +366,6 @@ export default class PlayBackController extends Component {
         if (this.state.isPlay || !this.video.v.paused) {
             return;
         }
-
 
         this.setState({
             isPlay: true
@@ -446,19 +420,19 @@ export default class PlayBackController extends Component {
 
             return (
                 <div 
-                    className="video-wrap"
+                    className="steamer-video-wrap"
                 >
-                    <div className="video-mask" onClick={this.switchPlayOrPause}></div>
-                    <div className="video-loading">
+                    <div className="steamer-video-mask" onClick={this.switchPlayOrPause}></div>
+                    <div className="steamer-video-loading">
                         {
                             this.state.canPlay ? 
                             null : <img src={require("../img/loading.gif")} />
                         }
                     </div>
-                    <div className="video-play-btn" style={playBtnStyle}>
+                    <div className="steamer-video-play-btn" style={playBtnStyle}>
                         <img src={require("../img/playbtn.png")}/>
                     </div>
-                    <div className="video-control">
+                    <div className="steamer-video-control">
                         {
                             (this.state.isPlay) ? 
                             <PlayButton pause={this.pause} /> : 
