@@ -40,15 +40,13 @@ export default class PlayBackController extends Component {
         this.manualMouseAdjustProgress = this.manualMouseAdjustProgress.bind(this);
         this.manualAdjustTime = this.manualAdjustTime.bind(this);
         this.play = this.play.bind(this);
-        this.playing = this.playing.bind(this);
+        // this.playing = this.playing.bind(this);
         this.pause = this.pause.bind(this);
         this.videoCanPlay = this.videoCanPlay.bind(this);
         this.videoTimeUpdate = this.videoTimeUpdate.bind(this);
         this.videoPlaying = this.videoPlaying.bind(this);
         this.videoEnded = this.videoEnded.bind(this);
         this.videoSeeking = this.videoSeeking.bind(this);
-        this.loadNextVideo = this.loadNextVideo.bind(this);
-        this.playNextVideo = this.playNextVideo.bind(this);
 
         this.video = {
             v: null,			// 当前播放的video element
@@ -99,12 +97,8 @@ export default class PlayBackController extends Component {
         // };
     }
     componentWillReceiveProps(nextProps) {
-        // this.initTicker(nextProps);
     }
     componentWillMount() {
-        // this.initTicker(this.props);
-
-        // this.initTotalTicker(this.props);
     }
     componentDidMount() {
         let controlPos = document.querySelector('.video-bar-control').getBoundingClientRect();
@@ -119,23 +113,6 @@ export default class PlayBackController extends Component {
         this.removeVideoEvent();
     }
 
-    // initTotalTicker(props) {
-    //     let videoDataList = props.videoData.list;
-    //     let totalDuration = 0;
-
-    //     for(var i = 0 ; i < videoDataList.length; i++) {
-    //         var curDuration = videoDataList[i].duration;
-    //         if(curDuration) {
-    //             totalDuration += curDuration;
-    //         }
-    //     }
-
-    //     // if (!this.progress.progressBar.duration) {
-    //     //     this.progress.progressBar.duration = duration;
-    //     //     this.progress.progressBar.durationText = getTotalDuraction(this.progress.progressBar.duration);
-
-    //     // }
-    // }
 
     removeVideoEvent() {
         let v = this.video.v;
@@ -194,7 +171,7 @@ export default class PlayBackController extends Component {
      * @param  {Object} e 事件对象
      */
     videoEnded(e) {
-        this.playNextVideo();
+        // this.playNextVideo();
         this.setState({
             isEnd: true
         });
@@ -205,7 +182,9 @@ export default class PlayBackController extends Component {
      * @param  {Object} e 事件对象
      */
     videoPlaying(e) {
-        this.playing();
+        this.setState({
+            isPlay: true
+        });
     }
 
     /**
@@ -229,6 +208,7 @@ export default class PlayBackController extends Component {
             this.video.v.src = videoDataList[id].url;
             this.video.v.load();
         }
+
         // let the one with src on top
         for (let i = 0; i < this.video.listLen; i++) {
             let v = this.video.list[i];
@@ -345,9 +325,8 @@ export default class PlayBackController extends Component {
     /**
      * 调整进度条位置
      * @param  {Float}  percentage  当前播放进度的比率
-     * @param  {Boolean} isManual   是否手动操作
      */
-    adjustProgress(percentage, isManual = false) {
+    adjustProgress(percentage) {
         let progressBar = this.progress.progressBar,
             controller = this.progress.controller,
             bar = this.progress.bar;
@@ -362,9 +341,6 @@ export default class PlayBackController extends Component {
         progressBar.currentTime = percentage * progressBar.duration;
         let interval = getIntervalTime(this.props.videoData.list, this.video.id);
 
-        if (!isManual && interval.max - progressBar.currentTime <= 10) {
-            this.loadNextVideo();
-        }
 
         this.setState({
             videoCurrentProgress: videoCurrentProgress + "%",
@@ -386,76 +362,22 @@ export default class PlayBackController extends Component {
         let interval = getIntervalTime(videoDataList, this.video.id);
 
 
-        // 当前播放时间处于当前的播放片段时，改变video的currentTime
-        if (progressBar.currentTime >= interval.min 
-            && progressBar.currentTime <= interval.max) {
-            this.video.v.currentTime = progressBar.currentTime - progressBar.accuTime;
-            this.play();
-        }
-        // if the current video piece is not in range, load the new piece
-        else {
-            for (let i = 0; i < len; i++) {
-                let v = videoDataList[i];
-                totalTime += v.duration;
-                if (totalTime > progressBar.currentTime) {
-                    progressBar.accuTime = totalTime - v.duration;
-                    let volume = this.video.v.volume;
-                    this.video.v.pause();
-                    this.video.v.removeAttribute('src');
-                    this.removeVideoEvent();
-                    this.initVideo(i);
-                    if (!this.video.v.src) {
-                        this.video.v.src = videoDataList[i].url;
-                    }
-                    this.video.v.volume = volume;
-                    this.video.v.currentTime = progressBar.currentTime - progressBar.accuTime;
-                    this.initVideoEvent();
-                    this.play();
-                    break;
-                }
-            }
-            interval.max = totalTime;
+        this.video.v.currentTime = progressBar.currentTime - progressBar.accuTime;
+        this.play();
 
-        }
-        let currentTime = this.state.videoCurrentTime;
-        if (interval.max - currentTime <= 10) {
-            this.loadNextVideo();
-        }
+
     }
-    // preload the next video
-    loadNextVideo() {
-        // console.log('load next video');
-        // let videoData = this.props.videoData.list,
-        //     len = videoData.length;
-        // // console.log(this.video, this.video.id, len - 1);
-        // if (this.video.id === len - 1) {
-        //     return;
-        // }
-        // let nextVideoId = this.video.id + 1;
-        // let nextVideo = this.video.list[nextVideoId % 3];
-        // if (!nextVideo.src) {
-        //     nextVideo.src = videoData[nextVideoId].url;
-        //     nextVideo.volume = this.video.v.volume;
-        //     nextVideo.load();
-        // }
-    }
-    // play tne next video
-    playNextVideo() {
-        console.log('play next');
-        // let videoData = this.props.videoData.list,
-        //     len = videoData.length;
-        // if (this.video.id === len - 1) {
-        //     this.pause();
-        //     return;
-        // }
-        // this.initVideo(this.video.id + 1);
-        // this.progress.progressBar.accuTime += this.props.videoData.list[this.video.id].duration;
-        // this.initVideoEvent();
-        // this.play();
-    }
+
+    /**
+     * 重新开始视频
+     */
     resume() {
         this.video.v.currentTime = 0;
     }
+
+    /**
+     * 播放视频
+     */
     play() {
 
         if (!this.state.canPlay || this.state.isPlay) {
@@ -472,11 +394,11 @@ export default class PlayBackController extends Component {
             this.video.v.play();
         });
     }
-    playing() {
-        this.setState({
-            isPlay: true
-        });
-    }
+
+
+    /**
+     * 暂停视频
+     */
     pause() {
 
         if (!this.state.canPlay) {
